@@ -1,4 +1,4 @@
 /venv
 /bookameal/__pycache__
 /tests/__pycache__
-.coveralls.yml
+# .coveralls.yml
