@@ -1,0 +1,9 @@
+MANIFEST.in
+bookameal/__init__.py
+bookameal/bookameal.py
+bookameal/models.py
+bookameal.egg-info/PKG-INFO
+bookameal.egg-info/SOURCES.txt
+bookameal.egg-info/dependency_links.txt
+bookameal.egg-info/requires.txt
+bookameal.egg-info/top_level.txt

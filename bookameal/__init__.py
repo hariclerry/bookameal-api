@@ -1,0 +1,1 @@
+from .bookameal import app
