@@ -2,6 +2,9 @@ import os
 from flask import Flask, request, Response, session, g, redirect, url_for, abort, render_template, flash, jsonify, json, make_response
 from .models import User, MealOption, Menu, Order
 
+from flasgger import Swagger, swag_from
+
+
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from .config import app_config
 
@@ -10,7 +13,7 @@ app = Flask(__name__)
 app.config.from_object(app_config[
     os.getenv("APP_ENV") or "development"
 ])
-
+swagger = Swagger(app)
 jwt = JWTManager(app)
 
 
@@ -22,6 +25,20 @@ def before_request():
         assert request.method == method
 
 
+@app.route('/colors/<palette>')
+def colors(palette):
+    all_colors = {
+        'cmyk': ['cian', 'magenta', 'yellow', 'black'],
+        'rgb': ['red', 'green', 'blue']
+    }
+    if palette == 'all':
+        result = all_colors
+    else:
+        result = {palette: all_colors.get(palette)}
+
+    return jsonify(result)
+
+
 @app.route('/')
 def welcome():
     return redirect(url_for('login'))
@@ -30,6 +47,7 @@ def welcome():
 
 
 @app.route('/api/v1/auth/signup', methods=['GET', 'POST'])
+@swag_from('bookameal/docs/signup.yml')
 def signup():
     if request.method == 'GET':
         return 'Method not yet impelemented'

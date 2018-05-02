@@ -3,6 +3,8 @@
     - "3.5.2"
   script:
     - python3 -m pytest
+    - pip install coverage
+    - pip install coveralls
 
   after_success:
     - coveralls

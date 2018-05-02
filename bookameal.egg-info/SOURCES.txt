@@ -1,6 +1,10 @@
 MANIFEST.in
+README.md
+bookameal/BaseModel.py
 bookameal/__init__.py
 bookameal/bookameal.py
+bookameal/colors.py
+bookameal/config.py
 bookameal/models.py
 bookameal.egg-info/PKG-INFO
 bookameal.egg-info/SOURCES.txt
