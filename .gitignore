@@ -1,7 +1,6 @@
 /venv
 /bookameal/__pycache__
 /tests/__pycache__
-.coveralls.yml
 /.pytest_cache
 /bookameal.egg-info
 /.eggs
