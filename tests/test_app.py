@@ -71,7 +71,7 @@ class CheckTestCase(unittest.TestCase):
         rv = self.app.post('/api/v1/menu',
                            content_type="application/json", data=menu)
         self.assertEqual(rv.status_code, 200)
-        self.assertIn("gnuts and pilao", rv.data.decode())
+        self.assertIn("Menu has been created", rv.data.decode())
 
     def test_get_menu(self):
         menu = json.dumps(
@@ -95,7 +95,7 @@ class CheckTestCase(unittest.TestCase):
         orders = ({"date": "2018-7-1", "meal_option": "cassava and milk"})
         rv = self.app.post(
             '/api/v1/orders', content_type="application/json", data=json.dumps(orders))
-        self.assertIn("cassava and milk", rv.data.decode())
+        self.assertIn("Order has been created", rv.data.decode())
 
     def test_get_order(self):
         rv = self.app.get('/api/v1/orders')

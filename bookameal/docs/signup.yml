@@ -43,3 +43,4 @@ responses:
       $ref: '#/definitions/Palette'
     examples:
       access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MjUyOTY3ODAsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTI1Mjk1ODgwLCJpZGVudGl0eSI6Im5hYmFhc2FyaWNoYXJkQGdtYWlsLmNvbSIsIm5iZiI6MTUyNTI5NTg4MCwidHlwZSI6ImFjY2VzcyIsImp0aSI6ImY5OWE0OGY5LThkY2UtNGZmMi1hNjhmLTg4ZGI5MDgwYjZhZCJ9.nqXt1kay-MqpufJWREyYcPVsn04_JTtWD5mcAJxkDPw"
+      message: "welcome, thanks for signing up"
