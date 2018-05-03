@@ -1,0 +1,36 @@
+Example endpoint for creating an order
+Pass a JSON user object to the post data to create an order
+---
+tags:
+  - Orders
+
+parameters:
+  - name: order details
+    in: body
+    type: json
+    description: The order details to be persisted
+    required: true
+    schema: 
+      type: object
+      required:
+        - "email"
+        - "password"
+      properties:
+        date:
+          type: "string"
+          example: "2018-7-9"
+        meal_option:
+          type: "string"
+          example: "matooke, rice and beef"
+        cusomer_id:
+          type: "int"
+          example: 1
+
+  - token: acces token
+    name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+    # required: true
+
+

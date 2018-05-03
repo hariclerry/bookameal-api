@@ -25,20 +25,6 @@ def before_request():
         assert request.method == method
 
 
-@app.route('/colors/<palette>')
-def colors(palette):
-    all_colors = {
-        'cmyk': ['cian', 'magenta', 'yellow', 'black'],
-        'rgb': ['red', 'green', 'blue']
-    }
-    if palette == 'all':
-        result = all_colors
-    else:
-        result = {palette: all_colors.get(palette)}
-
-    return jsonify(result)
-
-
 @app.route('/')
 def welcome():
     return redirect(url_for('login'))
@@ -46,35 +32,31 @@ def welcome():
 # register a user
 
 
-@app.route('/api/v1/auth/signup', methods=['GET', 'POST'])
-@swag_from('bookameal/docs/signup.yml')
+@app.route('/api/v1/auth/signup', methods=['POST'])
+@swag_from('/bookameal/docs/signup.yml')
 def signup():
-    if request.method == 'GET':
-        return 'Method not yet impelemented'
+    data = request.get_json()
+    User().save(data)
+    if data['password'] != data['password_conf']:
+        return jsonify({"message": "Passwords don't match!"}), 422
     else:
-        data = request.get_json()
-        User().save(data)
-        if data['password'] != data['password_conf']:
-            return jsonify({"message": "Passwords don't match!"}), 422
-        else:
-            access_token = create_access_token(identity=data['email'])
-            return jsonify(access_token=access_token), 200
+        message = "welcome, thanks for signing up"
+        access_token = create_access_token(identity=data['email'])
+        return jsonify(access_token=access_token, message=message), 200
 
 
-@app.route('/api/v1/auth/login', methods=['GET', 'POST'])
+@app.route('/api/v1/auth/login', methods=['POST'])
+@swag_from('/bookameal/docs/login.yml')
 def login():
-    if request.method == 'GET':
-        return jsonify(User().get_user_info(session['email']))
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
+    if (User().login(email, password)):
+        session['email'] = email
+        access_token = create_access_token(identity=email)
+        return jsonify(access_token=access_token), 200
     else:
-        data = request.get_json()
-        email = data['email']
-        password = data['password']
-        if (User().login(email, password)):
-            session['email'] = email
-            access_token = create_access_token(identity=email)
-            return jsonify(access_token=access_token), 200
-        else:
-            return jsonify({"message": "Invalid login credentials"}), 401
+        return jsonify({"message": "Invalid login credentials"}), 401
 
 
 @app.route('/api/v1/home')
@@ -90,51 +72,70 @@ def logout():
 
 
 # get all meal options (admin only)
-@app.route('/api/v1/meals/', methods=['GET', 'POST'])
+@app.route('/api/v1/meals/', methods=['POST'])
 # @jwt_required
-def manage_meals():
-    if request.method == 'GET':
-        meal_options = MealOption().json_all()
-        return jsonify(meal_options)
-    else:
-        data = request.get_json()
-        MealOption().save(data)
-        return jsonify(MealOption().json_all())
+@swag_from('/bookameal/docs/create_meals.yml')
+def create_meals():
+    data = request.get_json()
+    MealOption().save(data)
+    return jsonify(MealOption().json_all())
+
+
+@app.route('/api/v1/meals/', methods=['GET'])
+@swag_from('/bookameal/docs/get_meals.yml')
+def get_meals():
+    meal_options = MealOption().json_all()
+    return jsonify(meal_options)
 
 
 # update information of a meal option (admin only)
-@app.route('/api/v1/meals/<int:mealid>', methods=['POST', 'PUT', 'DELETE'])
+@app.route('/api/v1/meals/<int:mealid>', methods=['PUT'])
 # @jwt_required
+@swag_from('/bookameal/docs/edit_meals.yml')
 def meal_update(mealid):
-    if request.method == 'PUT':
-        data = request.get_json()
-        MealOption().find(mealid).update(data)
-        return jsonify(MealOption().json_all())
-    else:
-        MealOption().find(mealid).delete()
-        return jsonify(MealOption().json_all())
+    data = request.get_json()
+    MealOption().find(mealid).update(data)
+    return jsonify(MealOption().json_all())
+
+
+# update information of a meal option (admin only)
+@app.route('/api/v1/meals/<int:mealid>', methods=['DELETE'])
+@swag_from('/bookameal/docs/delete_meals.yml')
+def meal_delete(mealid):
+    MealOption().find(mealid).delete()
+    return jsonify({"message": "Meal deleted sucessfully"}), 200
 
 
 # setup the menu for the day & get the menu for the day (admin only[POST])
-@app.route('/api/v1/menu', methods=['GET', 'POST'])
-def days_menu():
-    if request.method == 'GET':
-        return jsonify(Menu().json_all())
-    else:
-        menu = request.get_json()
-        Menu().save(menu)
-        return jsonify(Menu().json_all())
+@app.route('/api/v1/menu', methods=['GET'])
+@swag_from('/bookameal/docs/get_menu.yml')
+def get_days_menu():
+    return jsonify(Menu().json_all())
+
+# setup the menu for the day & get the menu for the day (admin only[POST])
+
+
+@app.route('/api/v1/menu', methods=['POST'])
+@swag_from('/bookameal/docs/create_menu.yml')
+def create_days_menu():
+    menu = request.get_json()
+    Menu().save(menu)
+    return jsonify({"message": "Menu has been created"}), 200
 
 
 # select the meal option from the menu & get all orders (admin only)
-@app.route('/api/v1/orders', methods=['GET', 'POST'])
+@app.route('/api/v1/orders', methods=['GET'])
+@swag_from('/bookameal/docs/get_orders.yml')
 def view_orders():
-    if request.method == 'GET':
-        return jsonify(Order().json_all())
-    else:
-        data = request.get_json()
-        Order().save(data)
-        return jsonify(Order().json_all())
+    return jsonify(Order().json_all())
+
+
+@app.route('/api/v1/orders', methods=['POST'])
+@swag_from('/bookameal/docs/create_order.yml')
+def create_orders():
+    data = request.get_json()
+    Order().save(data)
+    return jsonify({"message": "Order has been created"}), 200
 
 
 # modify an order
@@ -182,6 +183,6 @@ def set_menu():
 
 # route for getting the menus registered for a day
 @app.route('/api/v1/days/<string:day>', methods=['GET'])
-def get_days_menu(day):
+def get_a_days_menu(day):
     menu = Menu().get_a_days_menu(day)
     return jsonify(menu)

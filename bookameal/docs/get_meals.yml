@@ -1,0 +1,21 @@
+Example endpoint for getting meals
+Return a list of all meals in the system
+---
+tags:
+  - Meals
+parameters:
+  - name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+    enum: 
+    # required: true
+    schema: 
+      type: string
+      required:
+        - "token"
+      properties: 
+        token:
+          type: "string"
+          example: "fish and rice"
+

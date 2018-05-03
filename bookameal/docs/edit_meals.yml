@@ -1,0 +1,39 @@
+Example endpoint for editing a meal option
+Pass a JSON user object to the post data to edit a meal option
+---
+tags:
+  - Meals
+
+parameters:
+  - name: meal option details
+    in: body
+    type: json
+    description: The user details to be persisted
+    required: true
+    schema: 
+      type: object
+      required:
+        - "email"
+        - "password"
+      properties:
+        meal_option:
+          type: "string"
+          example: "fish and rice"
+        meal_option_price:
+          type: "int"
+          example: 5000
+
+  - name: acces token
+    name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+  - name: mealid
+    in: path
+    description: The identifier of the meal being edited
+    properties:
+      mealid:
+        example: 1
+        type: "int"
+
+

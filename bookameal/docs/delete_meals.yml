@@ -1,0 +1,21 @@
+Example endpoint for deleting a meal option
+Pass a token and id strings to the authorise deleting a meal option
+---
+tags:
+  - Meals
+
+parameters:
+  - name: acces token
+    name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+  - name: mealid
+    in: path
+    description: The identifier of the meal being edited
+    properties:
+      mealid:
+        example: 1
+        type: "int"
+
+

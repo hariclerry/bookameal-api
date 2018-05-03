@@ -1,5 +1,5 @@
-Example endpoint for signingup a new User
-Pass a JSON user object to the post data to create a user
+Example endpoint for logging in new User
+Pass a JSON user object to the post data to login a user
 ---
 tags:
   - User
@@ -14,25 +14,13 @@ parameters:
     schema: 
       type: object
       required:
-        - "name"
         - "email"
-        - "location"
         - "password"
-        - "password_conf"
       properties: 
-        name:
-          type: "string"
-          example: "Nabaasa Richard"
         email:
           type: "string"
           example: "nabaasarichard@gmail.com"
-        location:
-          type: "string"
-          example: "Kampala"
         password:
-          type: "string"
-          example: "passWoRd"
-        password_conf:
           type: "string"
           example: "passWoRd"
 

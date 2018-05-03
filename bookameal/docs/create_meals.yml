@@ -1,0 +1,32 @@
+Example endpoint for creating a meal option
+Pass a JSON user object to the post data to create a meal
+---
+tags:
+  - Meals
+
+parameters:
+  - name: user details
+    in: body
+    type: json
+    description: The user details to be persisted
+    required: true
+    schema: 
+      type: object
+      required:
+        - "email"
+        - "password"
+      properties:
+        meal_option:
+          type: "string"
+          example: "fish and rice"
+        meal_option_price:
+          type: "integer"
+          example: 5000
+
+  - token: acces token
+    name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+
+
