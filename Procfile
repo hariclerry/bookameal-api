@@ -1,1 +1,2 @@
-web: gunicorn bookameal:bookameal
+web: gunicorn bookameal:app
+
