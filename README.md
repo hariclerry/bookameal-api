@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/RrNn/bookameal-api.svg?branch=flask-api-%23157243446)](https://travis-ci.org/RrNn/bookameal-api)
-[![Coverage Status](https://coveralls.io/repos/github/RrNn/bookameal-api/badge.svg?branch=ft-flask-api-157243446)](https://coveralls.io/github/RrNn/bookameal-api?branch=ft-flask-api-157243446)
+[![Build Status](https://travis-ci.org/RrNn/bookameal-api.svg?branch=ft-flask-api-swagg-docs-157273805)](https://travis-ci.org/RrNn/bookameal-api)
+[![Coverage Status](https://coveralls.io/repos/github/RrNn/bookameal-api/badge.svg?branch=ft-flask-api-swagg-docs-157273805)](https://coveralls.io/github/RrNn/bookameal-api?branch=ft-flask-api-swagg-docs-157273805)
 
 
 ### bookameal
@@ -21,3 +21,5 @@
 * Or if you want to see the coverage while testing, run `nosetests --with-coverage`
 
 * A working demo can be found at https://rrnn.github.io/bookameal/
+* To interact with the documentation, visit the hosted app on heroku at 
+	https://book-a-good-meal.herokuapp.com/apidocs/
