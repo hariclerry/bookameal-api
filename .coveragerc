@@ -20,3 +20,21 @@ omit=
 	*numbers.py
 	*stringprep.py
 	*uuid.py
+	*/_pytest/*
+	*/attr/*
+	*/certifi/*
+	*/click/*
+	*/flasgger/*
+	*/idna/*
+	*.itsdangerous.py
+	*/jinja2/*
+	*/jsonschema/*
+	*/jwt/*
+	*/markupsafe/*
+	*.mistune.py
+	*/more_itertools/*
+	*/pluggy/*
+	*/py/*
+	*.cgi.py
+	*/werkzeug/*
+	*/urllib3/*
