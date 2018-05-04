@@ -1,0 +1,22 @@
+[report]
+omit= 
+	*/venv/*
+	*/.eggs/*
+	*/.pytest_cache/*
+	*/bookameal.egg-info/*
+	*.travis.yml*
+	*.setup.py*
+	*requirements.txt*
+	*bookameal/config.py
+	*ctypes/__init__.py
+	*ctypes/_endian.py
+	*ctypes/util.py
+	*decimal.py
+	*encodings/idna.py
+	*hmac.py
+	*/html/*
+	*/http/*
+	*mimetypes.py
+	*numbers.py
+	*stringprep.py
+	*uuid.py

@@ -36,13 +36,14 @@ def welcome():
 @swag_from('/bookameal/docs/signup.yml')
 def signup():
     data = request.get_json()
-    User().save(data)
-    if data['password'] != data['password_conf']:
-        return jsonify({"message": "Passwords don't match!"}), 422
-    else:
-        message = "welcome, thanks for signing up"
-        access_token = create_access_token(identity=data['email'])
-        return jsonify(access_token=access_token, message=message), 200
+    if data != None:
+        User().save(data)
+        if data['password'] != data['password_conf']:
+            return jsonify({"message": "Passwords don't match!"}), 422
+        else:
+            message = "welcome, thanks for signing up"
+            access_token = create_access_token(identity=data['email'])
+            return jsonify(access_token=access_token, message=message), 201
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
@@ -78,14 +79,14 @@ def logout():
 def create_meals():
     data = request.get_json()
     MealOption().save(data)
-    return jsonify(MealOption().json_all())
+    return jsonify(MealOption().json_all()), 201
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
 @swag_from('/bookameal/docs/get_meals.yml')
 def get_meals():
     meal_options = MealOption().json_all()
-    return jsonify(meal_options)
+    return jsonify(meal_options), 200
 
 
 # update information of a meal option (admin only)
@@ -95,7 +96,7 @@ def get_meals():
 def meal_update(mealid):
     data = request.get_json()
     MealOption().find(mealid).update(data)
-    return jsonify(MealOption().json_all())
+    return jsonify(MealOption().json_all()), 201
 
 
 # update information of a meal option (admin only)
@@ -110,7 +111,7 @@ def meal_delete(mealid):
 @app.route('/api/v1/menu', methods=['GET'])
 @swag_from('/bookameal/docs/get_menu.yml')
 def get_days_menu():
-    return jsonify(Menu().json_all())
+    return jsonify(Menu().json_all()), 200
 
 # setup the menu for the day & get the menu for the day (admin only[POST])
 
@@ -120,7 +121,7 @@ def get_days_menu():
 def create_days_menu():
     menu = request.get_json()
     Menu().save(menu)
-    return jsonify({"message": "Menu has been created"}), 200
+    return jsonify({"message": "Menu has been created"}), 201
 
 
 # select the meal option from the menu & get all orders (admin only)
@@ -135,7 +136,7 @@ def view_orders():
 def create_orders():
     data = request.get_json()
     Order().save(data)
-    return jsonify({"message": "Order has been created"}), 200
+    return jsonify({"message": "Order has been created"}), 201
 
 
 # modify an order
@@ -143,15 +144,7 @@ def create_orders():
 def order_modify(orderid):
     data = request.get_json()
     Order().find(orderid).update(data)
-    return jsonify(Order().json_all())
-
-    date = data['date']
-    meal_option = data['meal_option']
-    user = User().get_user_info(session.get('email'))
-    customer_id = User().users.index(user)
-
-    Order().edit_order(orderid, customer_id, date, meal_option)
-    return jsonify(Order().orders)
+    return jsonify(Order().json_all()), 201
 
 
 # Routes that will be used for rendering templates later (These are custom routes)
