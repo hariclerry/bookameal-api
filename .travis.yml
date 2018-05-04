@@ -6,7 +6,8 @@
     - pip install coverage
     - pip install coveralls
   script:
-    - nosetests --with-coverage
+    # - nosetests --with-coverage
+    - nosetests --with-coverage --cover-erase --cover-package bookameal
   after_success:
     - coveralls
 
