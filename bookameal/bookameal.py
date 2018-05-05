@@ -74,7 +74,7 @@ def logout():
 
 # get all meal options (admin only)
 @app.route('/api/v1/meals/', methods=['POST'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/create_meals.yml')
 def create_meals():
     data = request.get_json()
@@ -83,6 +83,7 @@ def create_meals():
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
+@jwt_required
 @swag_from('/bookameal/docs/get_meals.yml')
 def get_meals():
     meal_options = MealOption().json_all()
@@ -91,7 +92,7 @@ def get_meals():
 
 # update information of a meal option (admin only)
 @app.route('/api/v1/meals/<int:mealid>', methods=['PUT'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/edit_meals.yml')
 def meal_update(mealid):
     data = request.get_json()
@@ -101,6 +102,7 @@ def meal_update(mealid):
 
 # update information of a meal option (admin only)
 @app.route('/api/v1/meals/<int:mealid>', methods=['DELETE'])
+@jwt_required
 @swag_from('/bookameal/docs/delete_meals.yml')
 def meal_delete(mealid):
     MealOption().find(mealid).delete()
@@ -109,6 +111,7 @@ def meal_delete(mealid):
 
 # setup the menu for the day & get the menu for the day (admin only[POST])
 @app.route('/api/v1/menu', methods=['GET'])
+@jwt_required
 @swag_from('/bookameal/docs/get_menu.yml')
 def get_days_menu():
     return jsonify(Menu().json_all()), 200
@@ -117,6 +120,7 @@ def get_days_menu():
 
 
 @app.route('/api/v1/menu', methods=['POST'])
+@jwt_required
 @swag_from('/bookameal/docs/create_menu.yml')
 def create_days_menu():
     menu = request.get_json()
@@ -126,12 +130,14 @@ def create_days_menu():
 
 # select the meal option from the menu & get all orders (admin only)
 @app.route('/api/v1/orders', methods=['GET'])
+@jwt_required
 @swag_from('/bookameal/docs/get_orders.yml')
 def view_orders():
     return jsonify(Order().json_all())
 
 
 @app.route('/api/v1/orders', methods=['POST'])
+@jwt_required
 @swag_from('/bookameal/docs/create_order.yml')
 def create_orders():
     data = request.get_json()
@@ -141,6 +147,7 @@ def create_orders():
 
 # modify an order
 @app.route('/api/v1/orders/<int:orderid>', methods=['POST', 'PUT'])
+@swag_from('/bookameal/docs/edit_order.yml')
 def order_modify(orderid):
     data = request.get_json()
     Order().find(orderid).update(data)

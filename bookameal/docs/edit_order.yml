@@ -1,0 +1,40 @@
+Example endpoint for editing an order
+Pass a JSON user object to the put data to edit an order
+---
+tags:
+  - Orders
+
+parameters:
+  - name: order option details
+    in: body
+    type: json
+    description: The user details to be persisted
+    required: true
+    schema: 
+      type: object
+      properties:
+        date:
+          type: "string"
+          example: "2018-7-9"
+        meal_option:
+          type: "string"
+          example: "fish and rice"
+        cusomer_id:
+          type: "int"
+          example: 1
+
+  - name: acces token
+    name: Access token
+    in: header
+    type: string
+    description: The long hashed access token you get after logging in or signing up
+  - name: orderid
+    in: path
+    description: The identifier of the meal being edited
+    properties:
+      orderid:
+        example: 1
+        type: "int"
+
+
+
