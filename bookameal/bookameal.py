@@ -92,7 +92,7 @@ def get_meals():
 
 # update information of a meal option (admin only)
 @app.route('/api/v1/meals/<int:mealid>', methods=['PUT'])
-@jwt_required
+# @jwt_required
 @swag_from('/bookameal/docs/edit_meals.yml')
 def meal_update(mealid):
     data = request.get_json()

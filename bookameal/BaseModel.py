@@ -1,6 +1,7 @@
 from abc import ABC
 
 data = {}
+
 last_insert_ids = {}
 
 

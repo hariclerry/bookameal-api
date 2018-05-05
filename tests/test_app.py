@@ -64,7 +64,7 @@ class CheckTestCase(unittest.TestCase):
     # test get meals code
 
     def test_get_meals_code(self):
-        rv = self.app.get('/api/v1/meals/')
+        rv = self.app.get('/api/v1/meals/',)
         self.assertEqual(rv.status_code, 200)
     # test get meals actiually returns data
 
