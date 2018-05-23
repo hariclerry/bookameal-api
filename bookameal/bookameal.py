@@ -16,13 +16,6 @@ app.config.from_object(app_config[
 ])
 swagger = Swagger(app)
 jwt = JWTManager(app)
-# for use in checking the data on the BaseModel class onl
-from .BaseModel import data
-
-
-@app.route('/data')
-def test():
-    return jsonify(Menu().json_all())
 
 
 @app.before_request
@@ -65,12 +58,6 @@ def login():
         return jsonify(access_token=access_token), 200
     else:
         return jsonify({"message": "Invalid login credentials"}), 401
-
-
-@app.route('/api/v1/home')
-def home():
-    days = Menu().menus
-    return jsonify(days)
 
 
 @app.route('/api/v1/auth/logout', methods=['GET'])

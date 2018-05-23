@@ -4,6 +4,7 @@
 /.pytest_cache
 /bookameal.egg-info
 /.eggs
+.coverage
 
 instance/
 .webassets-cache
