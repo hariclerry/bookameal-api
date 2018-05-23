@@ -146,15 +146,11 @@ class CheckTestCase(unittest.TestCase):
 # test getting menu actually gets them
 
     def test_get_menu(self):
-        menu = json.dumps(
-            {"date": "2018-9-7", "menu": ["fish and matooke", "milk and bread"]})
 
-        self.app.post('/api/v1/menu',
-                      content_type="application/json", data=menu)
         rv = self.app.get('/api/v1/menu', content_type="application/json")
         # these two tests are similar, but implemented in a diffrent fashion
-        assert b"fish and matooke" in rv.data
-        self.assertIn("fish and matooke", rv.data.decode())
+        assert b"milk and bread" in rv.data
+        self.assertIn("milk and bread", rv.data.decode())
 # test get menu status code
 
     def test_get_menu_code(self):
@@ -174,7 +170,8 @@ class CheckTestCase(unittest.TestCase):
         self.app.post('/api/v1/auth/signup',
                       content_type="application/json", data=user)
         # Now create an order, with the mail in session
-        orders = ({"date": "2018-7-1", "meal_option": "cassava and milk"})
+        orders = (
+            {"date": "2018-7-1", "meal_option": "cassava and milk", "customer_id": 1})
         rv = self.app.post(
             '/api/v1/orders', content_type="application/json", data=json.dumps(orders))
         self.assertIn("Order has been created", rv.data.decode())

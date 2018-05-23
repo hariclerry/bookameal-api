@@ -3,9 +3,16 @@ from .BaseModel import Model
 
 class User(Model):
 
-    def before_save(self):
+    def before_persist(self):
         self.isAdmin = False
         del self.password_conf
+
+    def before_save(self):
+        user = User().where("email", self.email)
+        if user != []:
+            return False
+        else:
+            return True
 
     def login(self, email, password):
         user = (User().where("email", email)
@@ -20,10 +27,23 @@ class User(Model):
 
 
 class MealOption(Model):
-    pass
+    def before_save(self):
+        meal_option = MealOption().where("meal_option", self.meal_option)
+        if meal_option != []:
+            return False
+        else:
+            return True
 
 
 class Menu(Model):
+
+    def before_save(self):
+        menu = Menu().where("date", self.date)
+        if menu != []:
+            return False
+        else:
+            return True
+
     def get_a_days_menu(self, day):
         i = 0
         while (i < len(self.menus)):

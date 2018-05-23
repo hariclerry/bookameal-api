@@ -37,14 +37,17 @@ class Model(ABC):
 
     def persist(self):
         existing = data.get(self.model_name, [])
-        self.before_save()
+        self.before_persist()
         existing.append(self)
         data[self.model_name] = existing
 
     def save(self, attributes):
         self.__init__(attributes)
         self.id = self.makeId()
-        self.persist()
+        if self.before_save():
+            self.persist()
+        else:
+            return
 
     def get_attributes(self):
         return self.__dict__
@@ -60,6 +63,9 @@ class Model(ABC):
         return list(map(lambda model: model.get_attributes(), self.get_all()))
 
     def before_save(self):
+        return True
+
+    def before_persist(self):
         pass
 
     @property
