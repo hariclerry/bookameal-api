@@ -23,7 +23,7 @@ parameters:
           type: "int"
           example: 5000
 
-  - name: acces token
+  - name: access token
     name: Access token
     in: header
     type: string

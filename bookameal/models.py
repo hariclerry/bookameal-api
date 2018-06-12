@@ -1,5 +1,15 @@
 from .BaseModel import Model
+from flask import abort
+from sqlalchemy import create_engine
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
+db_string = 'postgresql:///bookameal'
 
+db_session = scoped_session(sessionmaker(
+    autocommit=False, autoflush=False, bind=db_string))
+db = create_engine(db_string)
+base = declarative_base()
 
 class User(Model):
 
