@@ -1,4 +1,5 @@
 from flask import jsonify
+from .models import User, MealOption, Menu, Order
 
 
 class Validator:
@@ -13,6 +14,8 @@ class Validator:
             return "emailError"
         elif len(self.data['name']) < 1 or len(self.data['email']) < 1 or len(self.data['location']) < 1 or len(self.data['password']) < 1 or len(self.data['password_conf']) < 1:
             return "missingDataError"
+        elif User.check_if_email_exists(self.data['email']):
+            return "emailExists"
         else:
             return True
 
@@ -23,6 +26,8 @@ class Validator:
             return jsonify({"message": "Wrong email format!"}), 422
         elif self.signup() == "missingDataError":
             return jsonify({"message": "Some required data missing!"}), 422
+        elif self.signup() == "userExists":
+            return jsonify({"message":"The email address given already exists!"}), 422
         else:
             return True
 

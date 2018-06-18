@@ -36,6 +36,14 @@ class User(db.Model):
         db.session.commit()
         db.session.rollback()
 
+    @staticmethod
+    def check_if_email_exists(email):
+        user = User.query.filter_by(email=email).first()
+        if user is not None:
+            return "email_exists"
+        return "email_does_not_exist"
+        
+
     def before_persist(self):
         self.isAdmin = False
         del self.password_conf
