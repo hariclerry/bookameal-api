@@ -53,7 +53,6 @@ class Model(ABC):
         return self.__dict__
 
     def get_all(self):
-
         try:
             return data[self.model_name]
         except Exception as e:
@@ -77,6 +76,7 @@ class Model(ABC):
             return next(model for model in self.get_all() if model.id is id)
         except Exception as e:
             return None
+        
 
     def first(self):
         try:

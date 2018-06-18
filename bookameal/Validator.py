@@ -65,8 +65,8 @@ class Validator:
             return "customer_idError"
         elif len(self.data['date']) < 8:
             return "dateError"
-        elif len(self.data['meal_option']) < 3:
-            return "meal_optionError"
+        elif not isinstance(self.data['meal_option_id'],int):
+            return "meal_option_idError"
         else:
             return True
 
@@ -75,5 +75,5 @@ class Validator:
             return jsonify({"message": "Your session must have expired! Login and try again"}), 422
         elif self.create_order() == "dateError":
             return jsonify({"message": "The date provided is wrong or is in a wrong format!, The format is Year-Month-Day"}), 422
-        elif self.create_order() == "meal_optionError":
-            return jsonify({"message": "No valid meal provided"}), 422
+        elif self.create_order() == "meal_option_idError":
+            return jsonify({"message": "No valid meal id provided"}), 422

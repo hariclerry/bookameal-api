@@ -1,19 +1,12 @@
-import os
-from flask import Flask, request, Response, session, g, redirect, url_for, abort, render_template, flash, jsonify, json, make_response
+from flask import request, Response, session, g, redirect, url_for, abort, render_template, flash, jsonify, json, make_response
 from .models import User, MealOption, Menu, Order
 from .Validator import Validator
 
 from flasgger import Swagger, swag_from
 
-
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from .config import app_config
+from .application import app
 
-app = Flask(__name__)
-
-app.config.from_object(app_config[
-    os.getenv("APP_ENV") or "development"
-])
 swagger = Swagger(app)
 jwt = JWTManager(app)
 
@@ -40,7 +33,7 @@ def signup():
     if Validator(data).signup() != True:
         return Validator(data).signup_message()
     else:
-        User().save(data)
+        User(data['name'],data['email'],data['location'],data['password']).save()
         message = "welcome, thanks for signing up"
         access_token = create_access_token(identity=data['email'])
         return jsonify(access_token=access_token, message=message), 201
@@ -52,7 +45,7 @@ def login():
     data = request.get_json()
     email = data['email']
     password = data['password']
-    if (User().login(email, password)):
+    if User.login(email, password):
         session['email'] = email
         access_token = create_access_token(identity=email)
         return jsonify(access_token=access_token), 200
@@ -75,8 +68,17 @@ def create_meals():
     if Validator(data).create_meal() != True:
         return Validator(data).create_meal_message()
     else:
-        MealOption().save(data)
-        return jsonify(MealOption().json_all()), 201
+        MealOption(data['meal_option'],data['meal_option_price']).save()
+        meals = []
+        for mealoption in MealOption().get_all():
+            meal = {
+                'meal_option' : mealoption.meal_option,
+                'meal_price' : mealoption.meal_option_price
+            }
+            meals.append(meal)
+
+        
+        return jsonify({'Success':meals}), 201
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
@@ -125,7 +127,8 @@ def create_days_menu():
     if Validator(menu).create_menu() != True:
         return Validator(menu).create_menu_message()
     else:
-        Menu().save(menu)
+        # return jsonify(menu)
+        Menu(menu['date'],menu['menu']).save()
         return jsonify({"message": "Menu has been created"}), 201
 
 
@@ -144,7 +147,7 @@ def create_orders():
     if Validator(data).create_order() != True:
         return Validator(data).create_order_message()
     else:
-        Order().save(data)
+        Order(data['customer_id'],data['date'],data['meal_option_id']).save()
         return jsonify({"message": "Order has been created"}), 201
 
 

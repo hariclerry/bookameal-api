@@ -1,17 +1,40 @@
 from .BaseModel import Model
-from flask import abort
+from flask import abort, Flask
 from sqlalchemy import create_engine
 from sqlalchemy import Column, String, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
-db_string = 'postgresql:///bookameal'
+from flask_sqlalchemy import SQLAlchemy
 
-db_session = scoped_session(sessionmaker(
-    autocommit=False, autoflush=False, bind=db_string))
-db = create_engine(db_string)
-base = declarative_base()
+from .application import app
 
-class User(Model):
+
+# db_string = 'postgresql:///bookameal'
+
+# db_session = scoped_session(sessionmaker(
+#     autocommit=False, autoflush=False, bind=db_string))
+
+
+
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    email = Column(String, unique=True)
+    location = Column(String)
+    password = Column(String)
+
+    def __init__(self,name=None,email=None,location=None,password=None):
+        self.name = name
+        self.email = email
+        self.location = location
+        self.password = password
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        db.session.rollback()
 
     def before_persist(self):
         self.isAdmin = False
@@ -23,29 +46,55 @@ class User(Model):
             return False
         else:
             return True
-
-    def login(self, email, password):
-        user = (User().where("email", email)
-                and User().where("password", password))
-        if (user != []):
+    @staticmethod
+    def login(email, password):
+        # user = db.session.execute("SELECT * FROM users where email = 'email' ")
+        user = User.query.filter_by(email=email, password=password).first()        
+        if user is  not None:
             return True
-        else:
-            return False
+        return False
 
     def my_orders(self, user_id):
         return Order().get_user_orders(user_id)
 
 
-class MealOption(Model):
-    def before_save(self):
-        meal_option = MealOption().where("meal_option", self.meal_option)
-        if meal_option != []:
-            return False
-        else:
-            return True
+class MealOption(db.Model):
+    __tablename__ = "meal_options"
+    id = db.Column(db.Integer,primary_key=True)
+    meal_option = db.Column(db.String(30))
+    meal_option_price = db.Column(db.Integer)
+
+    def __init__(self,meal_option=None,meal_option_price=None):
+        self.meal_option = meal_option
+        self.meal_option_price = meal_option_price
+
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        db.session.rollback()
+
+    @staticmethod
+    def get_all():
+        return MealOption.query.all()
 
 
-class Menu(Model):
+
+class Menu(db.Model):
+
+    __tablename__ = "menus"
+    id = db.Column(db.Integer,primary_key=True)
+    date = db.Column(db.String,unique=True)
+    menu = db.Column(db.Text)
+
+    def __init__(self,date=None,menu=None):
+        self.date=date
+        self.menu=menu
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        db.session.rollback()
 
     def before_save(self):
         menu = Menu().where("date", self.date)
@@ -54,23 +103,23 @@ class Menu(Model):
         else:
             return True
 
-    def get_a_days_menu(self, day):
-        i = 0
-        while (i < len(self.menus)):
-            if self.menus[i]['date'] == day:
-                return self.menus[i]
-            i = i + 1
 
 
-class Order(Model):
+class Order(db.Model):
 
-    def get_user_orders(self, user_id):
-        for order in self.orders:
-            if order['customer_id'] == user_id:
-                return order
+    __tablename__ = "orders"
+    id = db.Column(db.Integer,primary_key=True)
+    customer_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+    date = db.Column(db.String)
+    meal_option_id = db.Column(db.Integer,db.ForeignKey('meal_options.id'))
 
-    def get_order(self, order_id):
-        if self.orders[order_id] in self.orders:
-            return self.orders[order_id]
-        else:
-            return "Order not found"
+    def __init__(self,customer_id,date,meal_option_id):
+        self.customer_id=customer_id
+        self.date=date
+        self.meal_option_id=meal_option_id
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        db.session.rollback()
+
