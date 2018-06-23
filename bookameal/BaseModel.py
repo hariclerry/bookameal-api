@@ -1,13 +1,9 @@
 from abc import ABC
-
 data = {}
 
 last_insert_ids = {}
-
-
 class Model(ABC):
     """Initialises the Model and sets the attributes passed thru the attributes dict"""
-
     def __init__(self, attributes={}):
         self.set_attributes(attributes)
 
@@ -40,6 +36,7 @@ class Model(ABC):
         self.before_persist()
         existing.append(self)
         data[self.model_name] = existing
+        
 
     def save(self, attributes):
         self.__init__(attributes)
@@ -48,6 +45,7 @@ class Model(ABC):
             self.persist()
         else:
             return
+
 
     def get_attributes(self):
         return self.__dict__

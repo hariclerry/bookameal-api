@@ -1,11 +1,10 @@
-from .BaseModel import Model
-
+from .basemodel import Model,data
 
 class User(Model):
 
-    def before_persist(self):
-        self.isAdmin = False
-        del self.password_conf
+    # def before_persist(self):
+    #     self.isAdmin = False
+    #     del self.password_conf
 
     def before_save(self):
         user = User().where("email", self.email)
@@ -14,10 +13,28 @@ class User(Model):
         else:
             return True
 
+    def check_email_existence(self,email):
+        if User().where("email",email) == []:
+            return "emailNotUsed"
+        return "emailUsed"
+
+
+    @staticmethod
+    def isAdmin(email):
+        admin = (User().where("isAdmin",True))
+        if admin[0].email == email:
+            return True
+        return False
+
+
     def login(self, email, password):
-        user = (User().where("email", email)
-                and User().where("password", password))
-        if (user != []):
+        '''
+        the variable is 'user' and not 'users' because only one user will always exist for an email
+        '''
+        user = User().where("email", email)
+        if user == []:
+            return False
+        elif user[0].password == password:
             return True
         else:
             return False
@@ -34,6 +51,11 @@ class MealOption(Model):
         else:
             return True
 
+    def check_meal_existence(self,meal_option):
+        if MealOption().where("meal_option",meal_option) == []:
+            return "mealNotRegistered"
+        return "mealRegistered"
+
 
 class Menu(Model):
 
@@ -44,12 +66,10 @@ class Menu(Model):
         else:
             return True
 
-    def get_a_days_menu(self, day):
-        i = 0
-        while (i < len(self.menus)):
-            if self.menus[i]['date'] == day:
-                return self.menus[i]
-            i = i + 1
+    def check_menu_existence(self,date):
+        if Menu().where("date",date) == []:
+            return "menuNotRegistered"
+        return "menuRegistered"
 
 
 class Order(Model):

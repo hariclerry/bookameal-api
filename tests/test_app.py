@@ -1,3 +1,5 @@
+'''This is a temporary test file. Tests are being refactored and put in different separate files per test'''
+
 import unittest
 import pytest
 from bookameal import app
@@ -62,7 +64,7 @@ class CheckTestCase(unittest.TestCase):
                            content_type="application/json", data=user)
         self.assertIn("Passwords don't match!", rv.data.decode())
     # test get meals code
-
+    ''' ------------------------------------------------------------------------'''
     def test_get_meals_code(self):
         rv = self.app.get('/api/v1/meals/',)
         self.assertEqual(rv.status_code, 200)
@@ -128,11 +130,15 @@ class CheckTestCase(unittest.TestCase):
 # test create menu actually creates the menu
 
     def test_create_menu(self):
+        access_token = create_access_token('testuser')
+        headers = {
+                'Authorization': 'Bearer {}'.format(access_token)
+                }
         menu = json.dumps(
             {"date": "2018-9-7", "menu": ["gnuts and pilao", "milk and bread"]})
 
         rv = self.app.post('/api/v1/menu',
-                           content_type="application/json", data=menu)
+                           headers=headers,content_type="application/json", data=menu)
         self.assertIn("Menu has been created", rv.data.decode())
 # test create menu status code
 
