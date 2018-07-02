@@ -1,6 +1,6 @@
 from flask import jsonify
 from .models import User,MealOption,Menu,Order
-# import re
+import re
 
 
 class Validator:

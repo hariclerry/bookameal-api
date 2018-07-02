@@ -52,6 +52,7 @@ def signup():
         return Validator(data).signup_message()
     else:
         User().save(data)
+        session['email'] = data['email']
         message = "welcome, thanks for signing up"
         access_token = create_access_token(identity=data['email'])
         return jsonify({'access_token': access_token, 'message': message}), 201
@@ -73,9 +74,7 @@ def login():
     if (User().login(email, password)):
         session['email'] = email
         access_token = create_access_token(identity=email)
-        
-        resp = jsonify({"access_token":access_token})
-        resp.status_code = 200
+        resp = jsonify({"access_token":access_token}), 200
         print(resp)
         return resp
 
@@ -107,11 +106,14 @@ def create_meals():
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/get_meals.yml')
 def get_meals():
+    # return jsonify("some data"),200
+    print(session['email'])
     if User.isAdmin(session['email']):
         meal_options = MealOption().json_all()
+        return jsonify("dada"),200
         return jsonify(meal_options), 200
     else:
         return jsonify({"message": "Only an admin can view meals in the system"}), 401
