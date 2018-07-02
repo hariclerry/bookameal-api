@@ -56,6 +56,28 @@ class MealOption(Model):
             return "mealNotRegistered"
         return "mealRegistered"
 
+    def check_meal_ids(self,ids):
+        for id in ids:
+            found = MealOption().where("id",id)
+            if found == []:
+                return "unfoundId"
+        return "foundIds"
+
+    def get_meals_by_ids(self,ids):
+        meals = []
+        i=0
+        try:
+            for i in ids:
+                meal = MealOption().where("id",i)
+                meals.append({
+                    "id":meal[0].id,
+                    "meal_option":meal[0].meal_option,
+                    "meal_option_price":meal[0].meal_option_price
+                    })
+            return meals
+        except Exception as e:
+            return meals
+
 
 class Menu(Model):
 
@@ -71,6 +93,25 @@ class Menu(Model):
             return "menuNotRegistered"
         return "menuRegistered"
 
+    def check_for_meal_in_menu(self,meal,date):
+        """The meal here comes as an integer, ie, as the meal id"""
+        meal = Menu().where("id",meal) and Menu().where("date",date)
+        if meal == []:
+            return "menuHasNoMeal"
+        return "menuHasMeal"
+
+
+    def json_all(self):
+        menus = list(map(lambda model: model.get_attributes(), self.get_all()))
+        menu_with_extracted_meals = []
+
+        for menu in menus:
+            menu['menu'] = MealOption().get_meals_by_ids(menu['menu'])
+            menu_with_extracted_meals.append(menu)
+        return menu_with_extracted_meals
+
+
+
 
 class Order(Model):
 
@@ -84,3 +125,25 @@ class Order(Model):
             return self.orders[order_id]
         else:
             return "Order not found"
+
+
+
+    def json_all(self):
+        orders = list(map(lambda model: model.get_attributes(), self.get_all()))
+        order_with_extracted_meals = []
+
+        for order in orders:
+            try:
+                meal_option = MealOption().where("id",order['meal_option'])[0].meal_option
+            except Exception as e:
+                meal_option = "Meal not available"
+            order_with_extracted_meals.append({
+                    "customer_id":order['customer_id'],
+                    "date":order['date'],
+                    "meal_option":meal_option
+                })
+        return order_with_extracted_meals
+
+
+
+

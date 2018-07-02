@@ -11,9 +11,9 @@ class CheckTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_signup_with_wrong_credentials(self):
-            user = json.dumps({"name": "Nabaasa Richard", "location": "Kampala",
-                               "email": "nabaasarichard@gmail.com", "password": "default", "password_conf": "different"})
-            rv = self.app.post('/api/v1/auth/signup',
-                               content_type="application/json", data=user)
-            self.assertIn("Passwords don't match!", rv.data.decode())
+    # def test_signup_with_wrong_credentials(self):
+    #         user = json.dumps({"name": "Nabaasa Richard", "location": "Kampala",
+    #                            "email": "nabaasarichard@gmail.com", "password": "default", "password_conf": "different"})
+    #         rv = self.app.post('/api/v1/auth/signup',
+    #                            content_type="application/json", data=user)
+    #         self.assertIn("Passwords don't match!", rv.data.decode())

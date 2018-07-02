@@ -19,7 +19,7 @@ class CheckTestCase(unittest.TestCase):
                                       content_type="application/json", data=user)
 
         # access_token = create_access_token('loggedin_user')
-        print(response.response)
+        print(response)
         access_token = (response.response['access_token'])
         headers = {
             'Authorization': 'Bearer {}'.format(access_token)

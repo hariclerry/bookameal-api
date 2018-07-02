@@ -73,10 +73,12 @@ def login():
     if (User().login(email, password)):
         session['email'] = email
         access_token = create_access_token(identity=email)
-        response = jsonify({"access_token":access_token})
-        response.status_code = 200
-        print(response.response)
-        return response
+        
+        resp = jsonify({"access_token":access_token})
+        resp.status_code = 200
+        print(resp)
+        return resp
+
     else:
 
         return jsonify({"message": "Invalid login credentials"}), 401
@@ -105,7 +107,7 @@ def create_meals():
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
-@jwt_required
+# @jwt_required
 @swag_from('/bookameal/docs/get_meals.yml')
 def get_meals():
     if User.isAdmin(session['email']):
