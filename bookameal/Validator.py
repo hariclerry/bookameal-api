@@ -59,6 +59,8 @@ class Validator:
     def create_menu(self):
         if len(self.data['menu']) < 1:
             return "menuError"
+        elif not self.date(self.data['date']):
+            return "dateFormatError"
         elif Menu().check_menu_existence(self.data['date']) == "menuRegistered":
             return "duplicateMenuError"
         elif MealOption().check_meal_ids(self.data['menu']) == "unfoundId":
@@ -67,7 +69,7 @@ class Validator:
             return True
 
     def create_menu_message(self):
-        if not self.date(self.data['date']):
+        if self.create_menu() == "dateFormatError":
             return jsonify({"message": "Wrong date format provided!, The format is Year-Month-Day(eg, 2018-01-01)"}), 422
         elif self.create_menu() == "menuError":
             return jsonify({"message": "Atleast one meal is required for the menu!"}), 422
@@ -81,6 +83,8 @@ class Validator:
             return "customer_idError"
         elif not isinstance(self.data['meal_option'],int):
             return "meal_optionError"
+        elif not self.date(self.data['date']):
+            return "dateFormatError"
         elif Menu().check_menu_existence(self.data['date']) == "menuNotRegistered":
             return "menuNotRegisteredError"
         elif Menu().check_for_meal_in_menu(self.data['meal_option'],self.data['date']) == "menuHasNoMeal":
@@ -91,7 +95,7 @@ class Validator:
     def create_order_message(self):
         if self.create_order() == "customer_idError":
             return jsonify({"message": "Your session must have expired! Login and try again"}), 422
-        elif not self.date(self.data['date']):
+        elif self.create_order() == "dateFormatError":
             return jsonify({"message": "Wrong date format provided!, The format is Year-Month-Day(eg, 2018-01-01)"}), 422
         elif self.create_order() == "meal_optionError":
             return jsonify({"message": "Provide a valid meal id"}), 422
