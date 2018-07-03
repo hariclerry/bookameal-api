@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/RrNn/bookameal-api.svg?branch=ft-flask-api-swagg-docs-157273805)](https://travis-ci.org/RrNn/bookameal-api)
-[![Coverage Status](https://coveralls.io/repos/github/RrNn/bookameal-api/badge.svg?branch=ft-flask-api-swagg-docs-157273805)](https://coveralls.io/github/RrNn/bookameal-api?branch=ft-flask-api-swagg-docs-157273805)
+[![Coverage Status](https://coveralls.io/repos/github/RrNn/bookameal-api/badge.svg?branch=ft-flask-api-swagg-docs-157273805&service=github)](https://coveralls.io/github/RrNn/bookameal-api?branch=ft-flask-api-swagg-docs-157273805)
 
 
 ### bookameal

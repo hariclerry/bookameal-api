@@ -113,7 +113,6 @@ def get_meals():
     print(session['email'])
     if User.isAdmin(session['email']):
         meal_options = MealOption().json_all()
-        return jsonify("dada"),200
         return jsonify(meal_options), 200
     else:
         return jsonify({"message": "Only an admin can view meals in the system"}), 401
