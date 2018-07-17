@@ -23,8 +23,8 @@ parameters:
           type: "int"
           example: 5000
 
-  - name: access token
-    name: Access token
+  - name: Token
+    name: Authorization
     in: header
     type: string
     description: The long hashed access token you get after logging in or signing up

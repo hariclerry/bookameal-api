@@ -143,7 +143,12 @@ class Menu(db.Model):
         db.session.rollback()
 
     def check_menu_existence(self,date_id):
-        menu = Menu.query.filter_by(id=date_id).first()
+        if type(date_id) == int:
+            menu = Menu.query.filter_by(id=date_id).first()
+        else:
+            menu = Menu.query.filter_by(date=date_id).first()
+        # if date_id doesnt come as an id, then filter by the date column
+        
         if menu is None:
             return "menuNotRegistered"
         return "menuRegistered"

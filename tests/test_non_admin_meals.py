@@ -74,8 +74,9 @@ class CheckTestCase(unittest.TestCase):
         meal = json.dumps(
             {"meal_option": "Salad and Mineral water", "meal_option_price": 20000})
         rv = self.tester.put('/api/v1/meals/1',
-                          content_type="application/json", data=meal) #headers=self.headers
+                          content_type="application/json", data=meal)
         self.assertTrue(rv.status_code, 200)
+
 
     def test_delete_meal(self):
         meal = json.dumps(
@@ -92,8 +93,18 @@ class CheckTestCase(unittest.TestCase):
         self.tester.post('/api/v1/meals/',
                       content_type="application/json", data=meal,headers=self.headers)
         rv = self.tester.delete(
-            '/api/v1/meals/1', content_type="application/json") #headers=self.headers
+            '/api/v1/meals/1', content_type="application/json",headers=self.headers)
         self.assertTrue(rv.status_code, 200)
+
+    def test_delete_meal_code(self):
+        meal = json.dumps(
+            {"meal_option": "Fish", "meal_option_price": 20000})
+        self.tester.post('/api/v1/meals/',
+                      content_type="application/json", data=meal,headers=self.headers)
+
+        rv = self.tester.delete(
+            '/api/v1/meals/1', content_type="application/json",headers=self.headers)
+        self.assertIn("Only an admin can delete a meal",rv.data.decode())
 
 
 

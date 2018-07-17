@@ -21,8 +21,6 @@ def before_request():
         request.environ['REQUEST_METHOD'] = method
         assert request.method == method
 
-# from bookameal.create_initial_admin import create_admin
-# create_admin()
 
 @app.route('/')
 def welcome():
@@ -83,8 +81,8 @@ def create_meals():
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
-@jwt_required
 @swag_from('/bookameal/docs/get_meals.yml')
+@jwt_required
 def get_meals():
     if User.is_admin((session['email'])):
         return jsonify(Meal.get_all()), 200
@@ -173,6 +171,24 @@ def order_modify(orderid):
     else:
         Order().update(orderid, data)
         return jsonify({"message": "Order has been edited"}), 201
+
+
+@app.route('/api/v1/auth/create_admin',methods=['POST'])
+@jwt_required
+
+def create_admin():
+    if User.is_admin(session['email']):
+        data = request.get_json()
+        if Validator(data).signup() != True:
+            return Validator(data).signup_message()
+        else:
+            hashed_pw = generate_password_hash(data['password'])
+            User(data['name'],data['email'],data['location'],hashed_pw,data['is_admin']).save()
+            message = "Admin registered"
+            return jsonify(message=message), 201
+    return jsonify({"message":"Only an admin can register another admin"})
+    
+
 
 
 

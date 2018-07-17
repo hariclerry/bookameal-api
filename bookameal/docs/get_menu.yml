@@ -4,7 +4,7 @@ Return a list of all menus in the system
 tags:
   - Menu
 parameters:
-  - name: Access token
+  - name: Authorization
     in: header
     type: string
     description: The long hashed access token you get after logging in or signing up

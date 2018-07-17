@@ -5,6 +5,15 @@
     - pip install -r requirements.txt
     - pip install coverage
     - pip install coveralls
+
+
+  before_script:
+    - psql -c 'create database "bookameal";' -U postgres
+    - psql -c 'create database "test";' -U postgres
+
+  services:
+    - postgresql
+
   script:
     # - nosetests --with-coverage
     - nosetests --with-coverage --cover-erase --cover-package bookameal

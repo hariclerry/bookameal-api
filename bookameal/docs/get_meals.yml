@@ -4,11 +4,23 @@ Return a list of all meals in the system
 tags:
   - Meals
 parameters:
-  - name: Access token
+  - name: Authorization
     in: header
     type: string
     description: The long hashed access token you get after logging in or signing up
     enum: 
     required: true
+
+responses:
+  401:
+    description: Only an admin can view meals
+  200:
+    description:
+    schema:
+      $ref: '#/definitions/Palette'
+    examples:
+      meals: '[{"meal_option": "meat" , "meal_price": 5000}]'
+
+   
 
 
