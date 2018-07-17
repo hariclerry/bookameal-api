@@ -1,5 +1,8 @@
 from flask import request, Response, session, g, redirect, url_for, abort, render_template, flash, jsonify, json, make_response
-from .models import User, MealOption, Menu, Order
+
+from werkzeug.security import generate_password_hash
+
+from .models import User, Meal, Menu, Order
 from .Validator import Validator
 
 from flasgger import Swagger, swag_from
@@ -18,6 +21,8 @@ def before_request():
         request.environ['REQUEST_METHOD'] = method
         assert request.method == method
 
+# from bookameal.create_initial_admin import create_admin
+# create_admin()
 
 @app.route('/')
 def welcome():
@@ -33,7 +38,9 @@ def signup():
     if Validator(data).signup() != True:
         return Validator(data).signup_message()
     else:
-        User(data['name'],data['email'],data['location'],data['password']).save()
+        hashed_pw = generate_password_hash(data['password'])
+        User(data['name'],data['email'],data['location'],hashed_pw).save()
+        session['email'] = data['email']
         message = "welcome, thanks for signing up"
         access_token = create_access_token(identity=data['email'])
         return jsonify(access_token=access_token, message=message), 201
@@ -45,6 +52,7 @@ def login():
     data = request.get_json()
     email = data['email']
     password = data['password']
+
     if User.login(email, password):
         session['email'] = email
         access_token = create_access_token(identity=email)
@@ -61,103 +69,115 @@ def logout():
 
 # get all meal options (admin only)
 @app.route('/api/v1/meals/', methods=['POST'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/create_meals.yml')
 def create_meals():
-    data = request.get_json()
-    if Validator(data).create_meal() != True:
-        return Validator(data).create_meal_message()
-    else:
-        MealOption(data['meal_option'],data['meal_option_price']).save()
-        meals = []
-        for mealoption in MealOption().get_all():
-            meal = {
-                'meal_option' : mealoption.meal_option,
-                'meal_price' : mealoption.meal_option_price
-            }
-            meals.append(meal)
-
-        
-        return jsonify({'Success':meals}), 201
+    if User.is_admin(session['email']):
+        data = request.get_json()
+        if Validator(data).create_meal() != True:
+            return Validator(data).create_meal_message()
+        else:
+            Meal(data['meal_option'],data['meal_option_price']).save()
+            return jsonify({"message":"Meal created successfully"}), 201
+    return jsonify({"message":"Only an admin can create a meal"}), 401
 
 
 @app.route('/api/v1/meals/', methods=['GET'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/get_meals.yml')
 def get_meals():
-    meal_options = MealOption().json_all()
-    return jsonify(meal_options), 200
+    if User.is_admin((session['email'])):
+        return jsonify(Meal.get_all()), 200
+    return jsonify({"message":"Only an admin can view meals"}), 401
 
 
 # update information of a meal option (admin only)
 @app.route('/api/v1/meals/<int:mealid>', methods=['PUT'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/edit_meals.yml')
 def meal_update(mealid):
-    data = request.get_json()
-    if Validator(data).create_meal() != True:
-        return Validator(data).edit_meal_message()
-    else:
-        MealOption().find(mealid).update(data)
-        return jsonify(MealOption().json_all()), 201
-
+    if User.is_admin((session['email'])):
+        data = request.get_json()
+        if Validator(data).create_meal() != True:
+            return Validator(data).edit_meal_message()
+        else:
+            Meal().update(mealid, data)
+            return jsonify({"message":"Meal updated successfully"}), 200
+    return jsonify({"message":"Only an admin can edit meals"}), 401
 
 # update information of a meal option (admin only)
 @app.route('/api/v1/meals/<int:mealid>', methods=['DELETE'])
 @jwt_required
 @swag_from('/bookameal/docs/delete_meals.yml')
 def meal_delete(mealid):
-    MealOption().find(mealid).delete()
-    return jsonify({"message": "Meal deleted sucessfully"}), 200
-
+    if User.is_admin((session['email'])):
+        Meal().delete(mealid)
+        return jsonify({"message": "Meal deleted sucessfully"}), 200
+    return jsonify({"message":"Only an admin can delete a meal"}), 401
 
 # setup the menu for the day & get the menu for the day (admin only[POST])
 @app.route('/api/v1/menu', methods=['GET'])
+@jwt_required
 @swag_from('/bookameal/docs/get_menu.yml')
 def get_days_menu():
-    return jsonify(Menu().json_all()), 200
+    return jsonify(Menu.get_all())
+
 
 # setup the menu for the day & get the menu for the day (admin only[POST])
 
 
 @app.route('/api/v1/menu', methods=['POST'])
+@jwt_required
 @swag_from('/bookameal/docs/create_menu.yml')
 def create_days_menu():
-    menu = request.get_json()
-    if Validator(menu).create_menu() != True:
-        return Validator(menu).create_menu_message()
-    else:
-        # return jsonify(menu)
-        Menu(menu['date'],menu['menu']).save()
-        return jsonify({"message": "Menu has been created"}), 201
+    if User.is_admin(session['email']):
+        data = request.get_json()
+        if Validator(data).create_menu() != True:
+            return Validator(data).create_menu_message()
+        else:
+            Menu(data['date'],data['menu']).save()
+            return jsonify({"message": "Menu has been created"}), 201
+    return jsonify({"message": "Only admin can create a menu"}), 401
 
 
 # select the meal option from the menu & get all orders (admin only)
 @app.route('/api/v1/orders', methods=['GET'])
+@jwt_required
 @swag_from('/bookameal/docs/get_orders.yml')
 def view_orders():
-    return jsonify(Order().json_all())
+    if User.is_admin(session['email']):
+        return jsonify(Order().get_all())
+    return jsonify({"message":"Only an admin can view orders"}), 401
 
 
 @app.route('/api/v1/orders', methods=['POST'])
-# @jwt_required
+@jwt_required
 @swag_from('/bookameal/docs/create_order.yml')
 def create_orders():
     data = request.get_json()
     if Validator(data).create_order() != True:
         return Validator(data).create_order_message()
     else:
-        Order(data['customer_id'],data['date'],data['meal_option_id']).save()
+        Order(data['customer_id'],data['date'],data['meal_option']).save()
         return jsonify({"message": "Order has been created"}), 201
 
 
 # modify an order
 @app.route('/api/v1/orders/<int:orderid>', methods=['POST', 'PUT'])
+@jwt_required
 @swag_from('/bookameal/docs/edit_order.yml')
 def order_modify(orderid):
     data = request.get_json()
     if Validator(data).create_order() != True:
         return Validator(data).create_order_message()
     else:
-        Order().find(orderid).update(data)
-        return jsonify(Order().json_all()), 201
+        Order().update(orderid, data)
+        return jsonify({"message": "Order has been edited"}), 201
+
+
+
+
+
+
+
+

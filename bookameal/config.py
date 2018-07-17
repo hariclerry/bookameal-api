@@ -7,7 +7,7 @@ class DefaultConfig:
 
 
 class DevelopmentConfig(DefaultConfig):
-    pass
+    SQLALCHEMY_DATABASE_URI = 'postgresql:///bookameal'
 
 
 class ProductionConfig(DefaultConfig):
@@ -15,7 +15,9 @@ class ProductionConfig(DefaultConfig):
 
 
 class TestingConfig(DefaultConfig):
-    pass
+    SQLALCHEMY_DATABASE_URI = 'postgresql:///test'
+    TESTING=True
+    DEBUG=True
 
 
 app_config = {

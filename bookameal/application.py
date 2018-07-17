@@ -1,9 +1,11 @@
 import os
 from flask import Flask
 from .config import app_config
+from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///bookameal'
+app.config.from_object(app_config[os.getenv("APP_ENV") or "development"])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-app.config.from_object(app_config[os.getenv("APP_ENV") or "development"])
+db = SQLAlchemy(app)
