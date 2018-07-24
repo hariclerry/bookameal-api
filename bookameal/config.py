@@ -1,23 +1,22 @@
-
+import os
 
 class DefaultConfig:
-    SECRET_KEY = b'_5#y2L"F4Q8z\n\xec/'
-    JWT_AUTH_URL_RULE = '/api/v1/auth/login'
-    JWT_AUTH_USERNAME_KEY = 'email'
-
+    SECRET_KEY=os.environ.get("SECRET_KEY")
 
 class DevelopmentConfig(DefaultConfig):
-    SQLALCHEMY_DATABASE_URI = 'postgresql:///bookameal'
-
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DEVELOPMENT_SQLALCHEMY_DATABASE_URI")
+    FLASK_DEBUG=True
 
 class ProductionConfig(DefaultConfig):
-    pass
+    SQLALCHEMY_DATABASE_URI = os.environ.get("PRODUCTION_SQLALCHEMY_DATABASE_URI")
+    TESTING=False
+    FLASK_DEBUG=False
 
 
 class TestingConfig(DefaultConfig):
-    SQLALCHEMY_DATABASE_URI = 'postgresql:///test'
+    SQLALCHEMY_DATABASE_URI = os.environ.get("TESTING_SQLALCHEMY_DATABASE_URI")
     TESTING=True
-    DEBUG=True
+    FLASK_EBUG=True
 
 
 app_config = {

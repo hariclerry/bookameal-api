@@ -7,15 +7,17 @@ from bookameal.application import app, db
 db.create_all()
 
 
+"""
+Creates an admin if there is none
+"""
+
 def create_admin():
-		# Check whether there is an initial admin
-		initial = User.query.filter_by(email="admin@bookameal.com").first()
-		# Check for any other admin
-		other = User.query.filter_by(isAdmin=True).first()
-		# Check whether there is any admin in the system
-		if bool(initial) or bool(other):
+		admin = User.query.filter_by(isAdmin=True).first()
+
+		if admin:
 			print("An admin already exists")
 			return
+
 		admin = User()
 		admin.name="admin"
 		admin.email="admin@bookameal.com"
