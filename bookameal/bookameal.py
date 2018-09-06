@@ -1,11 +1,15 @@
 from flask import request, Response, session, g, redirect, url_for, abort, render_template, flash, jsonify, json, make_response
 
+import datetime
+
 from werkzeug.security import generate_password_hash
 
 from .models import User, Meal, Menu, Order
 from .Validator import Validator
 
 from flasgger import Swagger, swag_from
+
+from flask_cors import cross_origin as c_o
 
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from .application import app
@@ -27,7 +31,8 @@ def welcome():
     return redirect(url_for('login'))
 
 # register a user
-@app.route('/api/v1/auth/signup', methods=['POST'])
+@app.route('/api/v1/auth/signup', methods=['POST','OPTIONS'])
+@c_o(supports_credentials=True)
 @swag_from('/bookameal/docs/signup.yml')
 def signup():
     data = request.get_json()
@@ -35,21 +40,26 @@ def signup():
         return Validator(data).signup()
     else:
         hashed_pw = generate_password_hash(data['password'])
-        User(data['name'], data['email'], data['location'], hashed_pw).save()
+        user = User(data['name'], data['email'], data['location'], hashed_pw).save()
         message = "welcome, thanks for signing up"
-        access_token = create_access_token(identity=data['email'])
-        return jsonify(access_token=access_token, message=message), 201
+        expires = datetime.timedelta(days=1)
+        
+        access_token = create_access_token(identity=data['email'],expires_delta=expires)
+        return jsonify(access_token=access_token, message=message,user_id=user.id,is_admin=False), 201
 
 # Login a user
 @app.route('/api/v1/auth/login', methods=['POST'])
+@c_o(supports_credentials=True)
 @swag_from('/bookameal/docs/login.yml')
 def login():
     data = request.get_json()
     email = data['email']
     password = data['password']
     if User.login(email, password):
-        access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token), 200
+        expires = datetime.timedelta(days=1)
+        
+        access_token = create_access_token(identity=email,expires_delta=expires)
+        return jsonify(access_token=access_token,user_id=User.get_id(email),is_admin=User.is_admin(email)), 200
     else:
         return jsonify({"message": "Invalid login credentials"}), 401
 
@@ -134,7 +144,7 @@ def create_days_menu():
         else:
             if Menu(data['date'], data['menu'], data['name']).save():
                 return jsonify({"message": "Menu has been created"}), 201
-            return jsonify({"message": "Menu already exists"}), 201
+            return jsonify({"message": "Menu already exists"}), 401
 
     return jsonify({"message": "Only admin can create a menu"}), 401
 
@@ -179,6 +189,14 @@ def order_modify(orderid):
     else:
         Order().update(orderid, data)
         return jsonify({"message": "Order has been edited"}), 201
+        
+# Get the orders for a specific customer
+@app.route('/api/v1/orders/<int:customerid>',methods=['GET'])
+# @jwt_required
+def get_customer_orders(customerid):
+    orders = Order.get_customer_orders(customerid)
+    return jsonify(orders)
+
 
 
 @app.route('/api/v1/auth/create_admin', methods=['POST'])

@@ -51,10 +51,7 @@ class CheckTestCase(unittest.TestCase):
         meal1 = json.dumps(
             {"meal_option": "fish and rice", "meal_option_price": 8000})
         self.tester.post(
-            self.meal_url,
-            content_type="application/json",
-            data=meal1,
-            headers=self.headers)
+            self.meal_url,content_type="application/json",data=meal1,headers=self.headers)
 
         meal2 = json.dumps(
             {"meal_option": "beans and rice", "meal_option_price": 8000})
@@ -110,7 +107,7 @@ class CheckTestCase(unittest.TestCase):
             rv.data.decode())
 
     # # Test you cant create a menu with meals that dont exist.
-    def test_create_menu_with_non_exixting_meal(self):
+    def test_create_menu_with_non_existing_meal(self):
         menu = json.dumps({"date": "2018-09-07","name":"breakfast", "menu": [1]})
         self.tester.post(
             self.url,

@@ -29,6 +29,7 @@ class CheckTestCase(unittest.TestCase):
         self.assertIn("Invalid login credentials", rv.data.decode())
 
     # Test user can login
+    # @pytest.mark.skip(reason="Will come later, not sure why 200 status code isn't being returned")
     def test_login_successfully(self):
         signup_user = json.dumps({
             "name":"richard",

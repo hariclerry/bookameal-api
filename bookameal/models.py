@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, Boolean
 # from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash
 from .application import app, db
+from datetime import datetime
 
 
 class User(db.Model):
@@ -31,6 +32,7 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
         db.session.rollback()
+        return self
 
     @staticmethod
     def check_if_email_exists(email):
@@ -47,6 +49,10 @@ class User(db.Model):
         if user.isAdmin:
             return True
         return False
+    @staticmethod
+    def get_id(email):
+        user = User.query.filter_by(email=email).first()
+        return user.id
 
     def before_save(self):
         user = User().where("email", self.email)
@@ -170,13 +176,11 @@ class Menu(db.Model):
         db.session.rollback()
         return True
 
-
     def check_menu_existence(self, date_id, category=None, mealid=None):
         menu = Menu.query.filter_by(date=date_id, category=category)
         if menu is None:
             return "menuNotRegistered"
         return "menuRegistered"
-
 
     def check_for_meal_in_menu(self, mealid, menu_id, category):
         menu = Menu.query.filter_by(date=menu_id, category=category).first()
@@ -206,11 +210,13 @@ class Menu(db.Model):
 
         for menu in menus:
             date = menu.date
+            
             if date not in dates:
                 dates.append(date)
 
         for date in dates:
             menus = Menu.query.filter_by(date=date)
+            day = datetime.strptime(date,"%Y-%m-%d").strftime("%A")
 
             breakfast = []
             lunch = []
@@ -239,7 +245,7 @@ class Menu(db.Model):
                 "lunch": lunch,
                 "dinner": dinner,
                 "supper": supper}
-            data.append({"date": date, "menu": day_menus})
+            data.append({"id": menu.id, "date": date, "day":day, "menu": day_menus})
         return data
 
 
@@ -296,20 +302,81 @@ class Order(db.Model):
         order.meal_option_id = data['meal_option']
         db.session.commit()
 
+
+    @staticmethod
+    def get_customer_orders(customerid):
+        customer_orders = []
+        data_raw = []
+        credit = 0
+        orders = Order.query.filter_by(customer_id=customerid).all()
+        if orders == []:
+            return []
+
+        for order in orders:
+            credit = credit + order.meal.meal_option_price
+            order_dict = {
+                "ids":[order.id],
+                "details":{
+                    "date":order.date.date,
+                    "day":datetime.strptime(order.date.date,"%Y-%m-%d").strftime("%A"),
+                    "name":order.date.category,
+                    "meal":order.meal.meal_option,
+                    "price":order.meal.meal_option_price
+                    },
+                    "order_number":1     
+            }
+            # customer_orders.append(order_dict)
+            if order_dict['details'] in data_raw:
+                for order_data in customer_orders:
+                    if order_data['details'] == order_dict['details']:
+                        order_data['order_number'] += 1
+                        order_data['ids'].append(order.id)
+            else:
+                data_raw.append(order_dict['details'])
+                customer_orders.append(order_dict) 
+        customer_orders = {"orders":customer_orders,"credit":credit}
+        return customer_orders
+
+
+
     def get_all(self):
         data = []
+        data_raw =[]
+        revenue = 0
         orders = Order.query.all()
         if orders == []:
             return []
         for order in orders:
-
-            order = {
-                "id": order.id,
-                "customer": order.user.name,
-                "meal": order.meal.meal_option,
-                "price": order.meal.meal_option_price,
-                "date": order.date.date,
-                "name": order.date.category
+            revenue = revenue + order.meal.meal_option_price
+            day = datetime.strptime(order.date.date,"%Y-%m-%d").strftime("%A")
+            
+            order_dict = {
+                "ids": [order.id],
+                "details": {
+                    "customer": order.user.name,
+                    "meal": order.meal.meal_option,
+                    "price": order.meal.meal_option_price,
+                    "date": order.date.date,
+                    "day":day,
+                    "name": order.date.category,
+                },
+                "order_number":1
             }
-            data.append(order)
-        return data
+            if order_dict['details'] in data_raw:
+                for order_data in data:
+                    if order_data['details'] == order_dict['details']:
+                        order_data['order_number'] += 1
+                        order_data['ids'].append(order.id)
+            else:
+                data_raw.append(order_dict['details'])
+                data.append(order_dict)           
+
+        orders = {"revenue":revenue,"orders":data}
+        return orders
+
+
+
+
+
+
+

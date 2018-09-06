@@ -58,9 +58,6 @@ class Validator:
         elif not isinstance(self.data['meal_option'], int):
             return jsonify(
                 {"message": "Meal id should be an integer, not string"}), 422
-        # elif not isinstance(self.data['date'], int):
-        #     return jsonify(
-        #         {"message": "Date id should be an integer, not string"}), 422
         elif Menu().check_menu_existence(self.data['date'], self.data['menu_category']) == "menuNotRegistered":
             return jsonify({"message": "Date with id " +
                             str(self.data['date']) + " not found"}), 422
